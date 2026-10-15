@@ -14,11 +14,48 @@
 
         body {
             background-color: #f4f6f9;
+            color: #1e293b;
+        }
+
+        /* Menú de Navegación */
+        .navbar {
+            background-color: #1e293b;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h1 {
+            color: #ffffff;
+            font-size: 20px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background-color: #2563eb;
+            color: #ffffff;
+        }
+
+        /* Formulario */
+        .main-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            padding: 40px 20px;
         }
 
         .form-container {
@@ -87,42 +124,83 @@
 </head>
 <body>
 
-    <div class="form-container">
-        <h2>Alta de Nuevo Cliente</h2>
-        <form>
-            <div class="form-group">
-                <label for="empresa">Nombre de la Empresa</label>
-                <input type="text" id="empresa" name="empresa" placeholder="Ej. Soluciones Digitales S.L." required>
-            </div>
+    <!-- Menú de Navegación -->
+    <nav class="navbar">
+        <h1>Panel CRM</h1>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="formulario.html" class="active">Alta de Cliente</a>
+        </div>
+    </nav>
 
-            <div class="form-group">
-                <label for="contacto">Nombre de Contacto</label>
-                <input type="text" id="contacto" name="contacto" placeholder="Ej. Juan Pérez" required>
-            </div>
+    <div class="main-container">
+        <div class="form-container">
+            <h2>Alta de Nuevo Cliente</h2>
+            <form id="clienteForm">
+                <div class="form-group">
+                    <label for="empresa">Nombre de la Empresa</label>
+                    <input type="text" id="empresa" name="empresa" placeholder="Ej. Soluciones Digitales S.L." required>
+                </div>
 
-            <div class="form-group">
-                <label for="correo">Correo Electrónico</label>
-                <input type="email" id="correo" name="correo" placeholder="ejemplo@empresa.com" required>
-            </div>
+                <div class="form-group">
+                    <label for="contacto">Nombre de Contacto</label>
+                    <input type="text" id="contacto" name="contacto" placeholder="Ej. Juan Pérez" required>
+                </div>
 
-            <div class="form-group">
-                <label for="telefono">Teléfono</label>
-                <input type="tel" id="telefono" name="telefono" placeholder="+34 600 000 000" required>
-            </div>
+                <div class="form-group">
+                    <label for="correo">Correo Electrónico</label>
+                    <input type="email" id="correo" name="correo" placeholder="ejemplo@empresa.com" required>
+                </div>
 
-            <div class="form-group">
-                <label for="estado">Estado del Cliente</label>
-                <select id="estado" name="estado" required>
-                    <option value="" disabled selected>Selecciona un estado</option>
-                    <option value="prospecto">Prospecto</option>
-                    <option value="activo">Activo</option>
-                    <option value="inactivo">Inactivo</option>
-                </select>
-            </div>
+                <div class="form-group">
+                    <label for="telefono">Teléfono</label>
+                    <input type="tel" id="telefono" name="telefono" placeholder="+34 600 000 000" required>
+                </div>
 
-            <button type="submit" class="btn-submit">Guardar Cliente</button>
-        </form>
+                <div class="form-group">
+                    <label for="estado">Estado del Cliente</label>
+                    <select id="estado" name="estado" required>
+                        <option value="" disabled selected>Selecciona un estado</option>
+                        <option value="prospecto">Prospecto</option>
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-submit">Guardar Cliente</button>
+            </form>
+        </div>
     </div>
+
+    <!-- Código JavaScript para Guardar Datos -->
+    <script>
+        document.getElementById('clienteForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Evita que se recargue la página
+
+            // Capturar datos del formulario
+            const nuevoCliente = {
+                empresa: document.getElementById('empresa').value,
+                contacto: document.getElementById('contacto').value,
+                correo: document.getElementById('correo').value,
+                telefono: document.getElementById('telefono').value,
+                estado: document.getElementById('estado').value
+            };
+
+            // Obtener clientes existentes o iniciar lista vacía
+            let clientes = JSON.parse(localStorage.getItem('crm_clientes')) || [];
+            
+            // Añadir el nuevo cliente
+            clientes.push(nuevoCliente);
+
+            // Guardar en la memoria del navegador
+            localStorage.setItem('crm_clientes', JSON.stringify(clientes));
+
+            alert('¡Cliente guardado con éxito!');
+            
+            // Redirigir al Dashboard para ver el resultado
+            window.location.href = 'dashboard.html';
+        });
+    </script>
 
 </body>
 </html>

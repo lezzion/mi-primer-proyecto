@@ -94,7 +94,7 @@
             color: #0f172a;
         }
 
-        /* Seccion Lista de Clientes */
+        /* Sección Lista de Clientes */
         .table-section {
             background-color: #ffffff;
             padding: 25px;
@@ -132,6 +132,7 @@
             font-size: 12px;
             font-weight: bold;
             display: inline-block;
+            text-transform: capitalize;
         }
 
         .badge-activo {
@@ -163,19 +164,19 @@
 
     <div class="container">
 
-        <!-- Tarjetas Metricas -->
+        <!-- Tarjetas Métricas -->
         <div class="metrics-grid">
             <div class="card">
                 <h3>Total Clientes</h3>
-                <div class="number">24</div>
+                <div class="number" id="totalClientes">0</div>
             </div>
             <div class="card activos">
                 <h3>Clientes Activos</h3>
-                <div class="number">18</div>
+                <div class="number" id="totalActivos">0</div>
             </div>
             <div class="card prospectos">
                 <h3>Prospectos</h3>
-                <div class="number">6</div>
+                <div class="number" id="totalProspectos">0</div>
             </div>
         </div>
 
@@ -192,33 +193,53 @@
                         <th>Estado</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>Tech Solutions S.L.</td>
-                        <td>Carlos Gómez</td>
-                        <td>carlos@techsolutions.com</td>
-                        <td>+34 611 222 333</td>
-                        <td><span class="status-badge badge-activo">Activo</span></td>
-                    </tr>
-                    <tr>
-                        <td>Diseños Innovadores</td>
-                        <td>María López</td>
-                        <td>maria@disenos.com</td>
-                        <td>+34 622 333 444</td>
-                        <td><span class="status-badge badge-prospecto">Prospecto</span></td>
-                    </tr>
-                    <tr>
-                        <td>Logística Global</td>
-                        <td>Pedro Sánchez</td>
-                        <td>pedro@logistica.com</td>
-                        <td>+34 633 444 555</td>
-                        <td><span class="status-badge badge-inactivo">Inactivo</span></td>
-                    </tr>
+                <tbody id="tablaClientesBody">
+                    <!-- Los clientes se cargarán dinámicamente aquí -->
                 </tbody>
             </table>
         </div>
 
     </div>
+
+    <!-- Código JavaScript para Cargar Datos y Métricas -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar clientes guardados en el navegador
+            const clientes = JSON.parse(localStorage.getItem('crm_clientes')) || [];
+
+            const tablaBody = document.getElementById('tablaClientesBody');
+            let activosCount = 0;
+            let prospectosCount = 0;
+
+            tablaBody.innerHTML = ''; // Limpiar la tabla
+
+            if (clientes.length === 0) {
+                tablaBody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">No hay clientes registrados aún.</td></tr>';
+            } else {
+                clientes.forEach(cliente => {
+                    // Contar para las métricas
+                    if (cliente.estado === 'activo') activosCount++;
+                    if (cliente.estado === 'prospecto') prospectosCount++;
+
+                    // Crear fila dinámicamente
+                    const fila = document.createElement('tr');
+                    fila.innerHTML = `
+                        <td>${cliente.empresa}</td>
+                        <td>${cliente.contacto}</td>
+                        <td>${cliente.correo}</td>
+                        <td>${cliente.telefono}</td>
+                        <td><span class="status-badge badge-${cliente.estado}">${cliente.estado}</span></td>
+                    `;
+                    tablaBody.appendChild(fila);
+                });
+            }
+
+            // Actualizar tarjetas de métricas
+            document.getElementById('totalClientes').textContent = clientes.length;
+            document.getElementById('totalActivos').textContent = activosCount;
+            document.getElementById('totalProspectos').textContent = prospectosCount;
+        });
+    </script>
 
 </body>
 </html>
