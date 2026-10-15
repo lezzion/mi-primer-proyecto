@@ -94,18 +94,35 @@
             color: #0f172a;
         }
 
+        /* Barra de Acciones y Filtros */
+        .actions-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            padding: 10px 15px;
+            width: 300px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #2563eb;
+        }
+
         /* Sección Lista de Clientes */
         .table-section {
             background-color: #ffffff;
             padding: 25px;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .table-section h2 {
-            font-size: 18px;
-            margin-bottom: 20px;
-            color: #1e293b;
         }
 
         .client-table {
@@ -149,6 +166,22 @@
             background-color: #fee2e2;
             color: #b91c1c;
         }
+
+        .btn-delete {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .btn-delete:hover {
+            background-color: #fecaca;
+        }
     </style>
 </head>
 <body>
@@ -180,9 +213,13 @@
             </div>
         </div>
 
-        <!-- Lista de Clientes -->
+        <!-- Sección Lista de Clientes con Buscador -->
         <div class="table-section">
-            <h2>Lista de Clientes Registrados</h2>
+            <div class="actions-bar">
+                <h2>Lista de Clientes Registrados</h2>
+                <input type="text" id="searchInput" class="search-input" placeholder="Buscar por empresa o contacto...">
+            </div>
+
             <table class="client-table">
                 <thead>
                     <tr>
@@ -191,6 +228,7 @@
                         <th>Email</th>
                         <th>Teléfono</th>
                         <th>Estado</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody id="tablaClientesBody">
@@ -201,43 +239,72 @@
 
     </div>
 
-    <!-- Código JavaScript para Cargar Datos y Métricas -->
+    <!-- Código JavaScript Avanzado -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Cargar clientes guardados en el navegador
+        // Función principal para renderizar la tabla y métricas
+        function actualizarDashboard(filtro = '') {
             const clientes = JSON.parse(localStorage.getItem('crm_clientes')) || [];
-
             const tablaBody = document.getElementById('tablaClientesBody');
+            
             let activosCount = 0;
             let prospectosCount = 0;
 
-            tablaBody.innerHTML = ''; // Limpiar la tabla
+            // Calcular métricas totales basándose en toda la data
+            clientes.forEach(cliente => {
+                if (cliente.estado === 'activo') activosCount++;
+                if (cliente.estado === 'prospecto') prospectosCount++;
+            });
 
-            if (clientes.length === 0) {
-                tablaBody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8;">No hay clientes registrados aún.</td></tr>';
-            } else {
-                clientes.forEach(cliente => {
-                    // Contar para las métricas
-                    if (cliente.estado === 'activo') activosCount++;
-                    if (cliente.estado === 'prospecto') prospectosCount++;
-
-                    // Crear fila dinámicamente
-                    const fila = document.createElement('tr');
-                    fila.innerHTML = `
-                        <td>${cliente.empresa}</td>
-                        <td>${cliente.contacto}</td>
-                        <td>${cliente.correo}</td>
-                        <td>${cliente.telefono}</td>
-                        <td><span class="status-badge badge-${cliente.estado}">${cliente.estado}</span></td>
-                    `;
-                    tablaBody.appendChild(fila);
-                });
-            }
-
-            // Actualizar tarjetas de métricas
             document.getElementById('totalClientes').textContent = clientes.length;
             document.getElementById('totalActivos').textContent = activosCount;
             document.getElementById('totalProspectos').textContent = prospectosCount;
+
+            // Filtrar clientes según lo que escriban en el buscador
+            const clientesFiltrados = clientes.filter(cliente => 
+                cliente.empresa.toLowerCase().includes(filtro.toLowerCase()) ||
+                cliente.contacto.toLowerCase().includes(filtro.toLowerCase())
+            );
+
+            tablaBody.innerHTML = '';
+
+            if (clientesFiltrados.length === 0) {
+                tablaBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#94a3b8;">No se encontraron clientes.</td></tr>';
+                return;
+            }
+
+            // Dibujar filas con su botón de eliminar único
+            clientesFiltrados.forEach((cliente, index) => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td>${cliente.empresa}</td>
+                    <td>${cliente.contacto}</td>
+                    <td>${cliente.correo}</td>
+                    <td>${cliente.telefono}</td>
+                    <td><span class="status-badge badge-${cliente.estado}">${cliente.estado}</span></td>
+                    <td><button class="btn-delete" onclick="eliminarCliente(${index})">Eliminar</button></td>
+                `;
+                tablaBody.appendChild(fila);
+            });
+        }
+
+        // Función para eliminar un cliente de la memoria
+        function eliminarCliente(index) {
+            let clientes = JSON.parse(localStorage.getItem('crm_clientes')) || [];
+            if (confirm('¿Estás seguro de que deseas eliminar este cliente?')) {
+                clientes.splice(index, 1); // Borra el elemento del array
+                localStorage.setItem('crm_clientes', JSON.stringify(clientes)); // Actualiza la memoria
+                actualizarDashboard(document.getElementById('searchInput').value); // Refresca la vista
+            }
+        }
+
+        // Escuchar eventos del buscador en tiempo real
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            actualizarDashboard(e.target.value);
+        });
+
+        // Cargar datos al iniciar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarDashboard();
         });
     </script>
 
