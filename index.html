@@ -1,1 +1,312 @@
-<h1>Hola, soy Raul</h1>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM - Dashboard Principal</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            color: #1e293b;
+        }
+
+        /* Menú de Navegación */
+        .navbar {
+            background-color: #1e293b;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h1 {
+            color: #ffffff;
+            font-size: 20px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background-color: #2563eb;
+            color: #ffffff;
+        }
+
+        /* Contenedor Principal */
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Tarjetas de Métricas */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid #2563eb;
+        }
+
+        .card.activos {
+            border-left-color: #16a34a;
+        }
+
+        .card.prospectos {
+            border-left-color: #d97706;
+        }
+
+        .card h3 {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .card .number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #0f172a;
+        }
+
+        /* Barra de Acciones y Filtros */
+        .actions-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            padding: 10px 15px;
+            width: 300px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #2563eb;
+        }
+
+        /* Sección Lista de Clientes */
+        .table-section {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .client-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .client-table th, .client-table td {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+
+        .client-table th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            text-transform: capitalize;
+        }
+
+        .badge-activo {
+            background-color: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-prospecto {
+            background-color: #fef3c7;
+            color: #b45309;
+        }
+
+        .badge-inactivo {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .btn-delete {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .btn-delete:hover {
+            background-color: #fecaca;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Menú de Navegación -->
+    <nav class="navbar">
+        <h1>Panel CRM</h1>
+        <div class="nav-links">
+            <a href="dashboard.html" class="active">Dashboard</a>
+            <a href="formulario.html">Alta de Cliente</a>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- Tarjetas Métricas -->
+        <div class="metrics-grid">
+            <div class="card">
+                <h3>Total Clientes</h3>
+                <div class="number" id="totalClientes">0</div>
+            </div>
+            <div class="card activos">
+                <h3>Clientes Activos</h3>
+                <div class="number" id="totalActivos">0</div>
+            </div>
+            <div class="card prospectos">
+                <h3>Prospectos</h3>
+                <div class="number" id="totalProspectos">0</div>
+            </div>
+        </div>
+
+        <!-- Sección Lista de Clientes con Buscador -->
+        <div class="table-section">
+            <div class="actions-bar">
+                <h2>Lista de Clientes Registrados</h2>
+                <input type="text" id="searchInput" class="search-input" placeholder="Buscar por empresa o contacto...">
+            </div>
+
+            <table class="client-table">
+                <thead>
+                    <tr>
+                        <th>Empresa</th>
+                        <th>Contacto</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaClientesBody">
+                    <!-- Los clientes se cargarán dinámicamente aquí -->
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- Código JavaScript Avanzado -->
+    <script>
+        // Función principal para renderizar la tabla y métricas
+        function actualizarDashboard(filtro = '') {
+            const clientes = JSON.parse(localStorage.getItem('crm_clientes')) || [];
+            const tablaBody = document.getElementById('tablaClientesBody');
+            
+            let activosCount = 0;
+            let prospectosCount = 0;
+
+            // Calcular métricas totales basándose en toda la data
+            clientes.forEach(cliente => {
+                if (cliente.estado === 'activo') activosCount++;
+                if (cliente.estado === 'prospecto') prospectosCount++;
+            });
+
+            document.getElementById('totalClientes').textContent = clientes.length;
+            document.getElementById('totalActivos').textContent = activosCount;
+            document.getElementById('totalProspectos').textContent = prospectosCount;
+
+            // Filtrar clientes según lo que escriban en el buscador
+            const clientesFiltrados = clientes.filter(cliente => 
+                cliente.empresa.toLowerCase().includes(filtro.toLowerCase()) ||
+                cliente.contacto.toLowerCase().includes(filtro.toLowerCase())
+            );
+
+            tablaBody.innerHTML = '';
+
+            if (clientesFiltrados.length === 0) {
+                tablaBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#94a3b8;">No se encontraron clientes.</td></tr>';
+                return;
+            }
+
+            // Dibujar filas con su botón de eliminar único
+            clientesFiltrados.forEach((cliente, index) => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td>${cliente.empresa}</td>
+                    <td>${cliente.contacto}</td>
+                    <td>${cliente.correo}</td>
+                    <td>${cliente.telefono}</td>
+                    <td><span class="status-badge badge-${cliente.estado}">${cliente.estado}</span></td>
+                    <td><button class="btn-delete" onclick="eliminarCliente(${index})">Eliminar</button></td>
+                `;
+                tablaBody.appendChild(fila);
+            });
+        }
+
+        // Función para eliminar un cliente de la memoria
+        function eliminarCliente(index) {
+            let clientes = JSON.parse(localStorage.getItem('crm_clientes')) || [];
+            if (confirm('¿Estás seguro de que deseas eliminar este cliente?')) {
+                clientes.splice(index, 1); // Borra el elemento del array
+                localStorage.setItem('crm_clientes', JSON.stringify(clientes)); // Actualiza la memoria
+                actualizarDashboard(document.getElementById('searchInput').value); // Refresca la vista
+            }
+        }
+
+        // Escuchar eventos del buscador en tiempo real
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            actualizarDashboard(e.target.value);
+        });
+
+        // Cargar datos al iniciar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarDashboard();
+        });
+    </script>
+
+</body>
+</html>
